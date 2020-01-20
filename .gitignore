@@ -29,3 +29,7 @@ var
 /.preferences.xml
 /.project
 /bin
+
+GPATH
+GRTAGS
+GTAGS
