@@ -31,11 +31,15 @@ object AFRepair {
     val suspicious = suspiciousIds.zipWithIndex.map({
       case (id, index) =>
         val script = SMTParser.parseFile(new File(extractedDir + "/" + id + ".smt2"))
-        val expr = script.commands().asScala.toList.map({
-          case asrt: C_assert => asrt.expr()
-        }).apply(0)
-        (index + 1, expr)
-    })
+        if (script != null) {
+          val expr = script.commands().asScala.toList.map({
+            case asrt: C_assert => asrt.expr()
+          }).apply(0)
+          (index + 1, expr)
+        } else {
+          null
+        }
+    }).filter(_ != null)
 
     //FIXME: (index + 1) is magic, without which it does not work (probably, I used id=0 for something else)
 

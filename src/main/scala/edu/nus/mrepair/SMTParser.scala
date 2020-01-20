@@ -31,13 +31,19 @@ object SMTParser {
       case e: IOException => {
         throw new Error("Failed to parse")
       }
+      case e: Exception => {
+        throw new Error("Failed to parse")
+      }
     }
-    assert(script != null)
+    // assert(script != null)
+    if (script == null) {
+      System.err.println("[SMTParser] fail to parse: " + smtlib2File);
+    }
     tmpFile.delete()
 
     script
   }
-  
+
   private def makeScript(smt2File: File, scriptFile: File) {
     var input: FileReader = null
     var output: FileWriter = null
