@@ -19,8 +19,8 @@ object ComponentVariableConverter {
       case Some(result) => result
       case None =>
         if (Utils.verbose) println("[warn] converting: failed to find component by id=" + id)
-        // components.map({ 
-        //   case c => 
+        // components.map({
+        //   case c =>
         //     if (Utils.verbose) print("id " + c.id + " ")
         //     if (Utils.verbose) println(c)
         // })
@@ -107,15 +107,15 @@ object ComponentVariableConverter {
     override def token: Parser[Token] =
       // Location variable:
       ( accept(Prefix.loc) ~> instanceWithLocation ^^ { case v => VariableToken(Location(v)) }
-      | (accept(Prefix.sepvar) ~> num) ~ (accept(Prefix.sep) ~> num) ^^ { case index ~ groupId => VariableToken(SeparatorVariable(index, groupId)) }
-      // Real variable:
-      | instance ^^ { case v => VariableToken(v) }
-      | num ^^ { case i => IntegerToken(i) }
-      | bool ^^ { case b => BooleanToken(b) }
-      | '(' ~> '-' ~> whitespaceChar.+ ~> num <~ ')' ^^ { case i => IntegerToken(-i) }
-      | '-' ~ '>' ^^ { case _ => ArrowToken() })
+        | (accept(Prefix.sepvar) ~> num) ~ (accept(Prefix.sep) ~> num) ^^ { case index ~ groupId => VariableToken(SeparatorVariable(index, groupId)) }
+        // Real variable:
+        | instance ^^ { case v => VariableToken(v) }
+        | num ^^ { case i => IntegerToken(i) }
+        | bool ^^ { case b => BooleanToken(b) }
+        | '(' ~> '-' ~> whitespaceChar.+ ~> num <~ ')' ^^ { case i => IntegerToken(-i) }
+        | '-' ~ '>' ^^ { case _ => ArrowToken() })
 
-    def ident: Parser[String] = (letter | '$' | '^') ~ (letter | digit | '_' | '@' | '$' | '^' | '#').* ^^ {
+    def ident: Parser[String] = (letter | '$' | '^' | '_') ~ (letter | digit | '_' | '@' | '$' | '^' | '#').* ^^ {
       case first ~ rest => first :: rest mkString ""
     }
 
@@ -129,7 +129,7 @@ object ComponentVariableConverter {
           case _ => false
         }
 
-    def instanceWithLocation: Parser[InstanceWithLocation] = 
+    def instanceWithLocation: Parser[InstanceWithLocation] =
       ( (accept(Prefix.stmt) ~> num) ~ (accept(Prefix.sep) ~> aux) ^^ {
           case stmt ~ rv => StatementInstance(rv, stmt)
         }
@@ -208,7 +208,8 @@ object ComponentVariableConverter {
 
     def parseVariable(input: String, cs: List[Component]): ComponentVariable = {
       components = cs
-      Z3OutputParser.variable(new lexical.Scanner(input)).get
+      val scanned = new lexical.Scanner(input);
+      Z3OutputParser.variable(scanned).get
     }
   }
 
