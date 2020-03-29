@@ -47,7 +47,7 @@ object RCGenerator {
     }).flatten ++ repairable.inGlobalDecls.flatten
 
     val (repairableObjects, extractedComponents) = 
-      extractRepairableObjects(repairableBindings, repairConfig.synthesisConfig, repairConfig.componentLevel)
+      extractRepairableObjects(repairableBindings, repairConfig)
 
     val sharedComponents = getSharedComponents(repairConfig.componentLevel)
     

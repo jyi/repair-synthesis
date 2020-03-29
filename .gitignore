@@ -33,3 +33,6 @@ var
 GPATH
 GRTAGS
 GTAGS
+.bloop
+.metals
+project/*

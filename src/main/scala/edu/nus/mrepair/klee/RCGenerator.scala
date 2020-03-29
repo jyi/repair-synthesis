@@ -149,8 +149,8 @@ object RCGenerator {
 
     VariableComponentSelector.angelicfixVariables = additionalVariables
 
-    val (repairableObjects, extractedComponents) = 
-      extractRepairableObjects(repairableBindings, repairConfig.synthesisConfig, repairConfig.componentLevel)
+    val (repairableObjects, extractedComponents) =
+      extractRepairableObjects(repairableBindings, repairConfig)
 
     //FIXME: when I support instances, it should be done using repairable objects
     val oldExprs = repairableBindings.map({
@@ -194,7 +194,6 @@ object RCGenerator {
         FormulaAST(testConstraintsForTestCase(formula, testId)) :: synthesisPart
     }).flatten
 
-
     val components = extractedComponents ++ sharedComponents
     if (Utils.enableLogging) prettyList(components).log("rc-components.log")
 
@@ -227,7 +226,7 @@ object RCGenerator {
             val s :: i :: Nil = v.name.split("#").tail.map(_.toInt).toList
             (s, i, beautifyResult(old(v.name)), beautifyResult(expr))
         })
-        
+
         (Left(changes), MaxSMTPlay.lastStat)
     }
 

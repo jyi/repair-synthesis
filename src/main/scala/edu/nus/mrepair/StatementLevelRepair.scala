@@ -40,7 +40,7 @@ object StatementLevelRepair {
   // returns presentation, components that are used in presentation and additional components
   private def splitAndSelectComponents(expr: ProgramFormulaExpression,
                                        stmtId: Int,
-                                       exeId: Int, 
+                                       exeId: Int,
                                        config: EncodingConfig,
                                        componentLevel: ComponentLevel): (ComponentPresentation, List[Component], List[Component]) = {
     var components = List[Component]()
@@ -61,8 +61,8 @@ object StatementLevelRepair {
       FunctionComponentNode(component, List(), Map(), bindings)
     }
 
-    def shallowUninterpretedFunctionComponent(uf: ProgramVariable, 
-                                              operandsTypes: List[Type], 
+    def shallowUninterpretedFunctionComponent(uf: ProgramVariable,
+                                              operandsTypes: List[Type],
                                               operands: List[ComponentPresentation]): FunctionComponentNode = {
       val component = ComponentLibrary.componentByFunctionSymbol(uf, operandsTypes)
       components = component :: components
@@ -70,7 +70,7 @@ object StatementLevelRepair {
       FunctionComponentNode(component, Nil, connections, Map())
     }
 
-    def shallowBinaryOperationComponent(op: BinaryOperator, 
+    def shallowBinaryOperationComponent(op: BinaryOperator,
                                         operands: List[ComponentPresentation]): FunctionComponentNode = {
       val component = ComponentLibrary.componentByOp(op)
       def alts: List[FunctionComponent] = ComponentLibrary.altOps(op).map(ComponentLibrary.componentByOp)
@@ -90,7 +90,7 @@ object StatementLevelRepair {
       FunctionComponentNode(component, Nil, connections, Map())
     }
 
-    def shallowUnaryOperationComponent(op: UnaryOperator, 
+    def shallowUnaryOperationComponent(op: UnaryOperator,
                                        operand: ComponentPresentation): FunctionComponentNode = {
       val component = ComponentLibrary.componentByOp(op)
       components = component :: components
@@ -244,7 +244,7 @@ object StatementLevelRepair {
         case exprComps =>
           //should be encoded separatly because all locations are bound
           exprComps.map({
-            case ec =>           
+            case ec =>
               group = group + 1
               encoder.encodeSemantics(ec :: Nil, Nil, group, testId, config)
           }).flatten
@@ -362,12 +362,16 @@ object StatementLevelRepair {
   }
 
   def extractRepairableObjects(rbs: RepairableBindings,
-                               config: EncodingConfig,
-                               componentLevel: ComponentLevel): (List[RepairableObject], List[Component]) = {
-    
+                               repairConfig: SynthesisConfig): (List[RepairableObject], List[Component]) = {
+
+    val config = repairConfig.synthesisConfig
+    val componentLevel = repairConfig.componentLevel
+
     val (exprComponents, exprPresentations) = rbs.map({
       case (v, expr, bound, stmtId, exeId) =>
-        val (pres, comps, additional) = splitAndSelectComponents(expr, stmtId, exeId, config, componentLevel)
+        val (pres, comps, additional) =
+          splitAndSelectComponents(expr, stmtId, exeId, config, componentLevel)
+
         (comps ++ additional, (v, bound, stmtId, exeId, comps, additional, pres))
     }).unzip
 
@@ -375,7 +379,7 @@ object StatementLevelRepair {
       case (stmtId, prs) =>
         prs match {
           case (v, bound, _, exeId, comps, additional, pres) :: Nil => SingleStatement(stmtId, bound, (BindingVariable(v), comps, additional, pres))
-          case l => 
+          case l =>
             val bound = l.map({ case (_, b, _, _, _, _, _) => b }).apply(0) //TODO verify that all are the same
             StatementInstances(stmtId, bound, l.map({
               case (v, _, _, exeId, comps, additional, pres) => (exeId, (BindingVariable(v), comps, additional, pres))
